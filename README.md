@@ -21,7 +21,7 @@ A small website allow user buy flight ticket using ASP .NET with API
 dotnet ef migrations remove --project Models --startup-project FlightBooking --context DbContext
 ```
 ```
-dotnet ef migrations add "Initial" --project Models --startup-project MilkTeaShop --context DbContext
+dotnet ef migrations add "Initial" --project Models --startup-project FlightBooking --context DbContext
 ```
 ```
 dotnet ef database update --project Models --startup-project FlightBooking --context DbContext
