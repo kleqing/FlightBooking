@@ -1,6 +1,8 @@
 ﻿using DataAccess.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Models.DTO;
 using Models.Models;
+using Utility.Constants;
 
 namespace FlightBooking.Controllers;
 
@@ -18,33 +20,61 @@ public class UserController : ControllerBase
 	[HttpPost]
 	public async Task<IActionResult> CreateUser([FromBody] User user)
 	{
-		var response = await _userRepository.AddUser(user);
-		if (!response.Success)
+		var result = new BaseResultResponse<User>();
+		var addUser = await _userRepository.AddUser(user);
+		
+		if (addUser == null)
 		{
-			return BadRequest(response);
+			result.Success = false;
+			result.Message = UserConstant.UserCreated;
+			return BadRequest(result);
 		}
-		return Ok(response);
+		return Ok(result);
 	}
 
 	[HttpGet]
 	public async Task<IActionResult> GetAllUsers()
 	{
+		var result = new BaseResultResponse<List<User>>();
 		var allUser = await _userRepository.GetAllUsers();
+		
 		if (allUser == null)
 		{
-			return NotFound();
+			result.Success = false;
+			result.Message = UserConstant.UserNotFound;
+			return NotFound(result);
 		}
-		return Ok(allUser);
+		result.Success = true;
+		result.Message = UserConstant.GetAllUserSuccess;
+		result.Data = allUser;
+		
+		return Ok(result);
 	}
 
 	[HttpPost("{Id}")]
 	public async Task<IActionResult> UpdateUser([FromBody] User user, Guid Id)
 	{
 		var response = await _userRepository.UpdateUser(user, Id);
-		if (!response.Success)
-		{
-			return BadRequest(response);
-		}
+		
 		return Ok(response);
+	}
+	
+	[HttpDelete("{Id}")]
+	public async Task<IActionResult> DeleteUser(Guid Id)
+	{
+		var result = new BaseResultResponse<User>();
+		var response = await _userRepository.DeleteUser(Id);
+		
+		if (response == null)
+		{
+			result.Success = false;
+			result.Message = UserConstant.UserNotFound;
+			return NotFound(result);
+		}
+		
+		result.Success = true;
+		result.Message = UserConstant.UserDeleted;
+		
+		return Ok(result);
 	}
 }
