@@ -20,27 +20,17 @@ public class UserRepository : IUserRepository
 		return await _db.User.ToListAsync();
 	}
 
-	public async Task<UserResponseDTO> AddUser(User? user)
+	public async Task<User> AddUser(User? user)
 	{
 		try
 		{
-			await _db.User.AddAsync(user);
+			var users = await _db.User.AddAsync(user);
 			await _db.SaveChangesAsync();
-			return new UserResponseDTO
-			{
-				Success = true,
-				Message = Constant.UserErrorType.CreateSuccess.GetDescription(),
-				User = user
-			};
+			return users.Entity;
 		}
 		catch (Exception e)
 		{
-			return new UserResponseDTO
-			{
-				Success = false,
-				Message = Constant.UserErrorType.CreateFailed.GetDescription(),
-				User = null
-			};
+			return null;
 		}
 	}
 	
@@ -49,17 +39,12 @@ public class UserRepository : IUserRepository
 		return await _db.User.FirstOrDefaultAsync(u => u.Id == Id);
 	}
 
-	public async Task<UserResponseDTO> UpdateUser(User user, Guid Id)
+	public async Task<User> UpdateUser(User user, Guid Id)
 	{
 		var users = await GetUserById(Id);
 		if (users == null)
 		{
-			return new UserResponseDTO
-			{
-				Success = false,
-				Message = Constant.UserErrorType.UpdateFailed.GetDescription(),
-				User = null
-			};
+			return null;
 		}
 		users.UserName = user.UserName;
 		users.Email = user.Email;
@@ -67,17 +52,16 @@ public class UserRepository : IUserRepository
 		users.DateOfBirth = user.DateOfBirth;
 		users.Address = user.Address;
 		await _db.SaveChangesAsync();
-		return new UserResponseDTO
-		{
-			Success = true,
-			Message = Constant.UserErrorType.UpdateSuccess.GetDescription(),
-			User = users
-		};
+		return users;
 	}
 
 	public async Task<User> DeleteUser(Guid id)
 	{
-		var users = await _db.User.FirstOrDefaultAsync(u => u.Id == id);
+		var users = await GetUserById(id);
+		if (users == null)
+		{
+			return null;
+		}
 		_db.User.Remove(users);
 		await _db.SaveChangesAsync();
 		return users;

@@ -8,7 +8,7 @@ public interface IUserRepository
 {
 	Task<List<User?>> GetAllUsers();
 	Task<User> GetUserById(Guid Id);
-	Task<UserResponseDTO> AddUser(User? user);
-	Task<UserResponseDTO> UpdateUser(User user, Guid Id);
+	Task<User> AddUser(User? user);
+	Task<User> UpdateUser(User user, Guid Id);
 	Task<User> DeleteUser(Guid id);
 }
